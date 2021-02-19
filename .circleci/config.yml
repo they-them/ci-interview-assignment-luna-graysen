@@ -27,18 +27,10 @@ commands:
       - run:
           name: Executing node version check
           command: node -v
-      - restore_cache:
-          name: Restore npm cache
-          key: v1-npm-{{ checksum "./package-lock.json" }}-{{ arch }}
       - run:
           working_directory: .
           name: Installing JavaScript dependencies
           command: npm install
-      - save_cache:
-          name: Save npm cache
-          key: v1-npm-{{ checksum "./package-lock.json" }}-{{ arch }}
-          paths:
-            - ././node_modules
 
   pods-dependencies:
     description: "Get cocoapods dependencies"
@@ -87,7 +79,7 @@ commands:
             npx detox build-framework-cache
 
 jobs:
-  ios-test:
+  detox-test:
     macos:
       xcode: 12.4.0
     steps:
@@ -110,10 +102,23 @@ jobs:
           working_directory: .
           name: Run iOS detox test
           command: npx detox test --configuration ios.sim.debug
-          
+            
+  ios-release-build:
+    macos:
+      xcode: 12.4.0
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - node-version
+      - npm-dependencies
+      - pods-dependencies
+      - react-native-dependencies
+      - simulator-dependencies
+      
       - run:
           working_directory: .
-          name: Generate release IPA
+          name: Generate Release IPA
           command: |
             react-native run-ios --configuration=release
             ls
@@ -124,4 +129,5 @@ workflows:
 
   run_detox_tests:
     jobs:
-      - ios-test
+      - detox-test
+      - ios-release-build
