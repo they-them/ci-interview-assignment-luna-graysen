@@ -204,12 +204,12 @@ jobs:
       - run:
           working_directory: .
           name: Run iOS detox build
-          command: npx detox build -c ios.sim.release
+          command: npx detox build --configuration ios.sim.debug
 
       - run:
           working_directory: .
           name: Run iOS detox test
-          command: npx detox test -c ios.sim.release --record-logs all > test-summary.txt
+          command: detox test --configuration ios.sim.debug --record-logs all > test-summary.txt
 
       - store_artifacts:
           path: ././artifacts
