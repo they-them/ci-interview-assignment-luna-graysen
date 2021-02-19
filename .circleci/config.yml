@@ -125,8 +125,7 @@ jobs:
             mv Applications Payload
             zip -vr Payload.zip Payload/
             mv Payload.zip InstagramClone.ipa
-            pwd
-   
+            zip -vr InstagramCloneIPA.zip InstagramClone.ipa 
       - store_artifacts:
           path: /Users/distiller/project/Archive.xcarchive/Products/InstagramClone.ipa
 
