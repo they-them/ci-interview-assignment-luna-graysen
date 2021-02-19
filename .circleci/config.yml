@@ -155,7 +155,7 @@ jobs:
 
   android-test:
     macos:
-      xcode: 11.3.1
+      xcode: 12.4
     steps:
       - attach_workspace:
           at: .
@@ -189,7 +189,7 @@ jobs:
 
   ios-test:
     macos:
-      xcode: 11.3.1
+      xcode: 12.4
     steps:
       - attach_workspace:
           at: .
