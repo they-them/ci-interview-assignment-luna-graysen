@@ -120,7 +120,7 @@ jobs:
           working_directory: .
           name: Generate Release IPA
           command: |
-            xcodebuild -scheme InstagramClone -workspace project/ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            xcodebuild -scheme InstagramClone -workspace ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
             cd Archive.xcarchive/Products/
             mv Applications Payload
             zip -vr Payload.zip Payload/
@@ -128,7 +128,7 @@ jobs:
             pwd
    
       - store_artifacts:
-          path: /Users/distiller/Archive.xcarchive/Products/InstagramClone.ipa
+          path: /Users/distiller/project/Archive.xcarchive/Products/InstagramClone.ipa
 
 workflows:
   version: 2
