@@ -49,7 +49,7 @@ commands:
           name: Getting cocoapods dependencies
           working_directory: ./ios
           command: |
-            sed -i '' 's=React/Core=React-Core=g' node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
+            sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
             pod install
       - save_cache:
           name: Save cocoapods specs and pods cache
