@@ -120,7 +120,7 @@ jobs:
           working_directory: .
           name: Generate Release IPA
           command: |
-            react-native run-ios --configuration=release
+            npx react-native run-ios --configuration=release
             ls
             pwd
 
