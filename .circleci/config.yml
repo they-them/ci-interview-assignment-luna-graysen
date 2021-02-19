@@ -34,29 +34,12 @@ commands:
   pods-dependencies:
     description: "Get cocoapods dependencies"
     steps:
-      - restore_cache:
-          name: Restore cocoapods specs and pods
-          key: v1-cocoapods-{{ checksum "./ios/Podfile.lock" }}-{{ arch }}
       - run:
           name: Getting cocoapods dependencies
           working_directory: ./ios
           command: |
             sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
             pod install
-      - save_cache:
-          name: Save cocoapods specs and pods cache
-          key: v1-cocoapods-{{ checksum "./ios/Podfile.lock" }}-{{ arch }}
-          paths:
-            - ./ios/Pods
-            - ~/.cocoapods
-
-  react-native-dependencies:
-    description: "Install RN dependencies"
-    steps:
-      - run:
-          name: "Install watchman"
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install watchman
 
   simulator-dependencies:
     description: "Install iOS simulator dependencies"
@@ -66,16 +49,6 @@ commands:
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
             HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
-
-  clear-detox-cache:
-    description: "Clears detox framework cache"
-    steps:
-      - run:
-          working_directory: .
-          name: Clear detox cache
-          command: |
-            npx detox clean-framework-cache
-            npx detox build-framework-cache
 
 jobs:
   detox-test:
@@ -88,9 +61,7 @@ jobs:
       - node-version
       - npm-dependencies
       - pods-dependencies
-      - react-native-dependencies
       - simulator-dependencies
-      - clear-detox-cache
 
       - run:
           working_directory: .
@@ -112,7 +83,6 @@ jobs:
       - node-version
       - npm-dependencies
       - pods-dependencies
-      - react-native-dependencies
       
       - run:
           working_directory: .
