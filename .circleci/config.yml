@@ -1,7 +1,6 @@
 version: 2.1
 
 commands:
-
   node-version:
     description: "Install node version 12"
     steps:
@@ -114,7 +113,6 @@ jobs:
       - npm-dependencies
       - pods-dependencies
       - react-native-dependencies
-      - simulator-dependencies
       
       - run:
           working_directory: .
@@ -132,7 +130,7 @@ jobs:
 workflows:
   version: 2
 
-  run_detox_tests:
+  test-and-build:
     jobs:
       - detox-test
       - ios-release-build
