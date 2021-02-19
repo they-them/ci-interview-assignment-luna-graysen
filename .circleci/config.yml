@@ -98,8 +98,6 @@ jobs:
           path: /Users/distiller/project/Archive.xcarchive/Products/InstagramCloneIPA.zip
 
 workflows:
-  version: 2
-
   test-and-build:
     jobs:
       - detox-test
