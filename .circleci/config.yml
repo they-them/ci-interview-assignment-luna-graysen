@@ -128,7 +128,7 @@ jobs:
             pwd
    
       - store_artifacts:
-          path: /Users/distiller/Archive2.xcarchive/Products/InstagramClone.ipa
+          path: /Users/distiller/Archive.xcarchive/Products/InstagramClone.ipa
 
 workflows:
   version: 2
