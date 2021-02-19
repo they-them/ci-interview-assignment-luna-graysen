@@ -1,6 +1,25 @@
 version: 2.1
 
 commands:
+  node-version:
+    description: "Install node version 12"
+    steps:
+      - run:
+          name: 'Install Project Node'
+          command: |
+            set +x
+            source ~/.bashrc
+
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+
+            nvm install 12.13.0
+            NODE_DIR=$(dirname $(which node))
+            echo "export PATH=$NODE_DIR:\$PATH" >> $BASH_ENV
+
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
@@ -22,15 +41,6 @@ commands:
             sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
             pod install
 
-  simulator-dependencies:
-    description: "Install iOS simulator dependencies"
-    steps:
-      - run:
-          name: "Install applesimutils"
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
-
 jobs:
   detox-test:
     macos:
@@ -39,9 +49,9 @@ jobs:
       - attach_workspace:
           at: .
       - checkout
+      - node-version
       - npm-dependencies
       - pods-dependencies
-      - simulator-dependencies
 
       - run:
           working_directory: .
@@ -60,6 +70,7 @@ jobs:
       - attach_workspace:
           at: .
       - checkout
+      - node-version
       - npm-dependencies
       - pods-dependencies
       
