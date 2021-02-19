@@ -209,7 +209,7 @@ jobs:
       - run:
           working_directory: .
           name: Run iOS detox test
-          command: detox test --configuration ios.sim.debug --record-logs all > test-summary.txt
+          command: npx detox test --configuration ios.sim.debug --record-logs all > test-summary.txt
 
       - store_artifacts:
           path: ././artifacts
