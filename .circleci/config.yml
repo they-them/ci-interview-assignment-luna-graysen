@@ -193,7 +193,6 @@ jobs:
           at: .
       - checkout
       - node-version
-      - bundle-dependencies
       - npm-dependencies
       - pods-dependencies
       - react-native-dependencies
