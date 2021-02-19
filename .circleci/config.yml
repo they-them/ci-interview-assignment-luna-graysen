@@ -41,6 +41,15 @@ commands:
             sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
             pod install
 
+  simulator-dependencies:
+    description: "Install iOS simulator dependencies"
+    steps:
+      - run:
+          name: "Install applesimutils"
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+            
 jobs:
   detox-test:
     macos:
@@ -52,6 +61,7 @@ jobs:
       - node-version
       - npm-dependencies
       - pods-dependencies
+      - simulator-dependencies
 
       - run:
           working_directory: .
