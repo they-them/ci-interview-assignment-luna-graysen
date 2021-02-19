@@ -109,15 +109,15 @@ jobs:
       - run:
           working_directory: .
           name: Run iOS detox test
-          command: npx detox test --configuration ios.sim.debug --record-logs all > test-summary.txt
-
-      - store_artifacts:
-          path: ././artifacts
-          destination: ./jest-logs
-
-      - store_artifacts:
-          path: ././reports
-          destination: ./reports
+          command: npx detox test --configuration ios.sim.debug
+          
+      - run:
+          working_directory: .
+          name: Generate release IPA
+          command: |
+            react-native run-ios --configuration=release
+            ls
+            pwd
 
 workflows:
   version: 2
