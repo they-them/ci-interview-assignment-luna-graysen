@@ -120,9 +120,15 @@ jobs:
           working_directory: .
           name: Generate Release IPA
           command: |
-            npx react-native run-ios --configuration=release
-            ls
+            xcodebuild -scheme InstagramClone -workspace project/ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            cd Archive.xcarchive/Products/
+            mv Applications Payload
+            zip -vr Payload.zip Payload/
+            mv Payload.zip InstagramClone.ipa
             pwd
+       
+       - store_artifacts:
+          path: /Users/distiller/Archive2.xcarchive/Products/InstagramClone.ipa
 
 workflows:
   version: 2
