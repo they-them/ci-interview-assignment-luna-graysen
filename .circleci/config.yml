@@ -39,6 +39,7 @@ commands:
           key: v1-npm-{{ checksum "./package-lock.json" }}-{{ arch }}
           paths:
             - ././node_modules
+
   pods-dependencies:
     description: "Get cocoapods dependencies"
     steps:
@@ -58,54 +59,6 @@ commands:
             - ./ios/Pods
             - ~/.cocoapods
 
-  gradle-dependencies:
-    description: "Get Gradle dependencies"
-    steps:
-      - run:
-          working_directory: ./android
-          name: Chmod permissions
-          command: sudo chmod +x ./gradlew
-      - restore_cache:
-          name: Restore Gradle cache
-          key: v1-gradle-{{ checksum "./android/build.gradle" }}-{{ checksum  "./android/app/build.gradle" }}-{{ arch }}
-      - run:
-          working_directory: ./android
-          name: Download Gradle dependencies
-          command: ./gradlew dependencies
-      - save_cache:
-          name: Save Gradle cache
-          paths:
-            - ~/.gradle
-          key: v1-gradle-{{ checksum "./android/build.gradle" }}-{{ checksum  "./android/app/build.gradle" }}-{{ arch }}
-
-  android-sdk-dependencies:
-    description: "Install and set android SDK"
-    steps:
-      - run:
-          name: set ANDROID_SDK_ROOT
-          command: |
-            echo 'export ANDROID_SDK_ROOT=$HOME/android-tools'  >> $BASH_ENV
-
-      - restore_cache:
-          key: android=tools-v1-{{ checksum "scripts/install-android-tools.sh" }}-{{ arch }}
-
-      - run:
-          name: install android tools
-          command: |
-            sh scripts/install-android-tools.sh
-            echo 'export PATH=$ANDROID_SDK_ROOT/tools/bin:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/platform-tools:$PATH'  >> $BASH_ENV
-            echo 'export PATH=$ANDROID_SDK_ROOT/emulator:$PATH'  >> $BASH_ENV
-            source $BASH_ENV
-            sdkmanager --list
-
-      - save_cache:
-          key: android=tools-v1-{{ checksum "scripts/install-android-tools.sh" }}-{{ arch }}
-          paths:
-            - /Users/distiller/android-tools
-
-
   react-native-dependencies:
     description: "Install RN dependencies"
     steps:
@@ -113,7 +66,6 @@ commands:
           name: "Install watchman"
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew install watchman
-
 
   simulator-dependencies:
     description: "Install iOS simulator dependencies"
@@ -123,22 +75,6 @@ commands:
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
             HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
-
-  create-launch-android-emulator:
-    description: "create and launch android emulators"
-    steps:
-      - run:
-          name: create AVD
-          command: echo "no" | avdmanager --verbose create avd --force --name "Pixel_3a_API_29" --package "system-images;android-29;google_apis;x86_64"
-
-      - run:
-          name: start AVD
-          command: emulator @Pixel_3a_API_29 -no-window -no-audio
-          background: true
-
-      - run:
-          name: wait for emulator
-          command: adb wait-for-device shell 'while [[ -z $(getprop dev.bootcomplete) ]]; do sleep 1; done;'
 
   clear-detox-cache:
     description: "Clears detox framework cache"
@@ -150,43 +86,7 @@ commands:
             npx detox clean-framework-cache
             npx detox build-framework-cache
 
-
 jobs:
-
-  android-test:
-    macos:
-      xcode: 12.4.0
-    steps:
-      - attach_workspace:
-          at: .
-      - checkout
-      - node-version
-      - npm-dependencies
-      - react-native-dependencies
-      - gradle-dependencies
-      - android-sdk-dependencies
-      - create-launch-android-emulator
-      - clear-detox-cache
-
-      - run:
-          working_directory: .
-          name: Run android detox build
-          command: npx detox build -c android.emu.release
-
-      - run:
-          working_directory: .
-          name: Run android detox test
-          command: npx detox test -c android.emu.release --headless --record-logs all
-
-      - store_artifacts:
-          path: ././artifacts
-          destination: ./jest-logs
-
-      - store_artifacts:
-          path: ././reports
-          destination: ./reports
-
-
   ios-test:
     macos:
       xcode: 12.4.0
@@ -219,11 +119,9 @@ jobs:
           path: ././reports
           destination: ./reports
 
-
 workflows:
   version: 2
 
   run_detox_tests:
     jobs:
-      - android-test
       - ios-test
