@@ -7,14 +7,14 @@ commands:
   install-node:
     steps:
       - node/install:
-          with-cache: false
           node-version: 12.13.0
       - run: node --version
 
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
-      - node/install-packages
+      - node/install-packages:
+          with-cache: false
 
   pods-dependencies:
     description: "Get cocoapods dependencies"
