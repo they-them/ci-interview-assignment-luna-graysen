@@ -8,6 +8,7 @@ commands:
     steps:
       - node/install:
           node-version: 12.13.0
+          install-yarn: true
       - run: node --version
 
   install-npm-dependencies:
@@ -15,18 +16,22 @@ commands:
     steps:
       - node/install-packages:
           with-cache: false
-          override-ci-command: npm install --force
+          override-ci-command: yarn install --force
 
   install-pods-dependencies:
     description: Install CocoaPods dependencies
     steps:
       - run:
-          name: Workaround React/Core issue
+          name: Workaround React/Core -> React-Core issue
           command: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
       - run:
-          name: Install CocoaPods dependencies
           working_directory: ./ios
           command: pod install
+          
+  install-detox:
+    description: Install Detox CLI
+    steps:
+      - run: npm install -g detox-cli
             
 jobs:
   detox-test:
@@ -48,13 +53,8 @@ jobs:
 
       - run:
           working_directory: .
-          name: Run iOS detox build
-          command: npx detox build --configuration ios.sim.debug
-
-      - run:
-          working_directory: .
-          name: Run iOS detox test
-          command: npx detox test --configuration ios.sim.debug
+          name: Run iOS detox build and test
+          command: yarn test
             
   ios-release-build:
     macos:
