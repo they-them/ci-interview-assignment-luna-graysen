@@ -7,6 +7,7 @@ commands:
   install-node:
     steps:
       - node/install:
+          with-cache: false
           node-version: 12.13.0
       - run: node --version
 
