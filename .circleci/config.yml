@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   node: circleci/node@4.1.1
+  cocoapods: dantoml/cocoapods@0.0.2
 
 commands:
   install-node:
@@ -10,23 +11,20 @@ commands:
           node-version: 12.13.0
       - run: node --version
 
-  npm-dependencies:
-    description: "Get JavaScript dependencies"
+  install-npm-packages:
+    description: "Install NPM packages"
     steps:
       - node/install-packages:
           override-ci-command: npm install --force
 
-  pods-dependencies:
-    description: "Get cocoapods dependencies"
+  install-pods-dependencies:
+    description: "Install CocoaPods dependencies"
     steps:
-      - run:
-          name: Getting cocoapods dependencies
-          working_directory: ./ios
-          command: |
-            sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
-            pod install
+      - run: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
+      - cocoapods/install:
+          use-bundler: false
 
-  simulator-dependencies:
+  install-simulator-dependencies:
     description: "Install iOS simulator dependencies"
     steps:
       - run:
@@ -44,10 +42,10 @@ jobs:
           at: .
       - checkout
       - install-node
-      - npm-dependencies
-      - pods-dependencies
-      - simulator-dependencies
-
+      - install-npm-packages
+      - install-pods-dependencies
+      - install-simulator-dependencies
+      
       - run:
           working_directory: .
           name: Run iOS detox build
@@ -66,8 +64,8 @@ jobs:
           at: .
       - checkout
       - install-node
-      - npm-dependencies
-      - pods-dependencies
+      - install-npm-packages
+      - install-pods-dependencies
       
       - run:
           working_directory: .
