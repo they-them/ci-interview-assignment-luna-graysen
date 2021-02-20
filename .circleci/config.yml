@@ -62,7 +62,7 @@ jobs:
       - install_pods_dependencies
       
       - run:
-          name: Generate Release IPA
+          name: Generate Release XCArchive
           working_directory: .
           command: xcodebuild -scheme InstagramClone -workspace ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
             
