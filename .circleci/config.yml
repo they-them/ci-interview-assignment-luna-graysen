@@ -5,10 +5,7 @@ orbs:
 
 commands:
   install-node:
-    docker:
-      - image: 'cimg/node:12.13.0'
     steps:
-      - checkout
       - node/install:
           install-yarn: true
       - run: node --version
