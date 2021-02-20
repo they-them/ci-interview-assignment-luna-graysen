@@ -12,26 +12,20 @@ commands:
       - run: node --version
 
   install-npm-dependencies:
-    description: Install NPM dependencies
     steps:
       - node/install-packages:
           with-cache: false
           override-ci-command: yarn install --force
 
   install-pods-dependencies:
-    description: Install CocoaPods dependencies
     steps:
       - run:
           name: Workaround React/Core -> React-Core issue
           command: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
       - run:
+          name: Install CocoaPods dependencies
           working_directory: ./ios
           command: pod install
-          
-  install-detox:
-    description: Install Detox CLI
-    steps:
-      - run: npm install -g detox-cli
             
 jobs:
   detox-test:
@@ -46,14 +40,14 @@ jobs:
       - install-pods-dependencies
       
       - run:
-          name: "Install applesimutils"
+          name: Install applesimutils
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
             HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
 
       - run:
-          working_directory: .
           name: Run iOS detox build and test
+          working_directory: .
           command: yarn test
             
   ios-release-build:
@@ -68,10 +62,14 @@ jobs:
       - install-pods-dependencies
       
       - run:
-          working_directory: .
           name: Generate Release IPA
+          working_directory: .
+          command: xcodebuild -scheme InstagramClone -workspace ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            
+      - run:
+          name: Prepare Release IPA for upload
+          working_directory: .
           command: |
-            xcodebuild -scheme InstagramClone -workspace ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
             cd Archive.xcarchive/Products/
             mv Applications Payload
             zip -vr Payload.zip Payload/
