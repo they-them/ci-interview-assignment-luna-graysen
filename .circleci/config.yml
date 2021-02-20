@@ -4,14 +4,12 @@ orbs:
   node: circleci/node@4.1.1
 
 commands:
-  install-node-example:
-    docker:
-      - image: 'cimg/base:12.13.0'
+  install-node:
+    description: "Install Node"
     steps:
-      - checkout
       - node/install:
+          version: 12.13.0
           install-yarn: true
-      - run: node --version
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
@@ -50,6 +48,7 @@ jobs:
       - attach_workspace:
           at: .
       - checkout
+      - install-node
       - npm-dependencies
       - pods-dependencies
       - simulator-dependencies
@@ -71,6 +70,7 @@ jobs:
       - attach_workspace:
           at: .
       - checkout
+      - install-node
       - npm-dependencies
       - pods-dependencies
       
