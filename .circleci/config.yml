@@ -14,10 +14,7 @@ commands:
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
-      - run:
-          working_directory: .
-          name: Installing JavaScript dependencies
-          command: npm install
+      - node/install-packages
 
   pods-dependencies:
     description: "Get cocoapods dependencies"
