@@ -4,20 +4,21 @@ orbs:
   node: circleci/node@4.1.1
 
 commands:
-  install-node:
+  install_node:
     steps:
       - node/install:
+          # this could be upgraded to LTS or newer but ran out of time.
           node-version: 12.13.0
           install-yarn: true
       - run: node --version
 
-  install-npm-dependencies:
+  install_yarn_dependencies:
     steps:
       - node/install-packages:
           with-cache: false
           override-ci-command: yarn install --force
 
-  install-pods-dependencies:
+  install_pods_dependencies:
     steps:
       - run:
           name: Workaround React/Core -> React-Core issue
@@ -28,16 +29,16 @@ commands:
           command: pod install
             
 jobs:
-  detox-test:
+  detox_test:
     macos:
       xcode: 12.4.0
     steps:
       - attach_workspace:
           at: .
       - checkout
-      - install-node
-      - install-npm-dependencies
-      - install-pods-dependencies
+      - install_node
+      - install_yarn_dependencies
+      - install_pods_dependencies
       
       - run:
           name: Install applesimutils
@@ -50,16 +51,16 @@ jobs:
           working_directory: .
           command: yarn test
             
-  ios-release-build:
+  ios_release_build:
     macos:
       xcode: 12.4.0
     steps:
       - attach_workspace:
           at: .
       - checkout
-      - install-node
-      - install-npm-dependencies
-      - install-pods-dependencies
+      - install_node
+      - install_yarn_dependencies
+      - install_pods_dependencies
       
       - run:
           name: Generate Release IPA
@@ -80,7 +81,7 @@ jobs:
           path: /Users/distiller/project/Archive.xcarchive/Products/InstagramCloneIPA.zip
 
 workflows:
-  test-and-build:
+  test_and_build:
     jobs:
-      - detox-test
-      - ios-release-build
+      - detox_test
+      - ios_release_build
