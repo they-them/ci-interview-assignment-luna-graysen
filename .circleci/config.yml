@@ -1,9 +1,17 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@12.13.0
+  node: circleci/node@4.1.1
 
 commands:
+  install-node-example:
+    docker:
+      - image: 'cimg/base:12.13.0'
+    steps:
+      - checkout
+      - node/install:
+          install-yarn: true
+      - run: node --version
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
