@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   node: circleci/node@4.1.1
-  cocoapods: dantoml/cocoapods@0.0.2
 
 commands:
   install-node:
@@ -11,27 +10,23 @@ commands:
           node-version: 12.13.0
       - run: node --version
 
-  install-npm-packages:
-    description: "Install NPM packages"
+  install-npm-dependencies:
+    description: Install NPM dependencies
     steps:
       - node/install-packages:
+          with-cache: false
           override-ci-command: npm install --force
 
   install-pods-dependencies:
-    description: "Install CocoaPods dependencies"
-    steps:
-      - run: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
-      - cocoapods/install:
-          use-bundler: false
-
-  install-simulator-dependencies:
-    description: "Install iOS simulator dependencies"
+    description: Install CocoaPods dependencies
     steps:
       - run:
-          name: "Install applesimutils"
-          command: |
-            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
-            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+          name: Workaround React/Core issue
+          command: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
+      - run:
+          name: Install CocoaPods dependencies
+          working_directory: ./ios
+          command: pod install
             
 jobs:
   detox-test:
@@ -42,10 +37,15 @@ jobs:
           at: .
       - checkout
       - install-node
-      - install-npm-packages
+      - install-npm-dependencies
       - install-pods-dependencies
-      - install-simulator-dependencies
       
+      - run:
+          name: "Install applesimutils"
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+
       - run:
           working_directory: .
           name: Run iOS detox build
@@ -64,7 +64,7 @@ jobs:
           at: .
       - checkout
       - install-node
-      - install-npm-packages
+      - install-npm-dependencies
       - install-pods-dependencies
       
       - run:
@@ -77,6 +77,7 @@ jobs:
             zip -vr Payload.zip Payload/
             mv Payload.zip InstagramClone.ipa
             zip -vr InstagramCloneIPA.zip InstagramClone.ipa 
+            
       - store_artifacts:
           path: /Users/distiller/project/Archive.xcarchive/Products/InstagramCloneIPA.zip
 
