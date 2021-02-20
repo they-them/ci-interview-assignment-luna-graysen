@@ -7,8 +7,7 @@ commands:
   install_node:
     steps:
       - node/install:
-          # this could be upgraded to LTS or newer but ran out of time.
-          node-version: 12.13.0
+          node-version: 14.15.5
           install-yarn: true
       - run: node --version
 
