@@ -5,17 +5,17 @@ orbs:
 
 commands:
   install-node:
-    description: "Install Node"
+    docker:
+      - image: 'cimg/node:12.13.0'
     steps:
+      - checkout
       - node/install:
-          version: 12.13.0
           install-yarn: true
+      - run: node --version
+
   npm-dependencies:
     description: "Get JavaScript dependencies"
     steps:
-      - run:
-          name: Executing node version check
-          command: node -v
       - run:
           working_directory: .
           name: Installing JavaScript dependencies
