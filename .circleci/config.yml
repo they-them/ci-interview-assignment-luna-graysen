@@ -1,0 +1,86 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.1.1
+
+commands:
+  install_node:
+    steps:
+      - node/install:
+          node-version: 14.15.5
+          install-yarn: true
+      - run: node --version
+
+  install_yarn_dependencies:
+    steps:
+      - node/install-packages:
+          with-cache: false
+          override-ci-command: yarn install --force
+
+  install_pods_dependencies:
+    steps:
+      - run:
+          name: Workaround React/Core -> React-Core issue
+          command: sed -i '' 's=React/Core=React-Core=g' /Users/distiller/project/node_modules/react-native-fetch-blob/react-native-fetch-blob.podspec
+      - run:
+          name: Install CocoaPods dependencies
+          working_directory: ./ios
+          command: pod install
+            
+jobs:
+  detox_test:
+    macos:
+      xcode: 12.4.0
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - install_node
+      - install_yarn_dependencies
+      - install_pods_dependencies
+      
+      - run:
+          name: Install applesimutils
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+
+      - run:
+          name: Run iOS detox build and test
+          working_directory: .
+          command: yarn test
+            
+  ios_release_build:
+    macos:
+      xcode: 12.4.0
+    steps:
+      - attach_workspace:
+          at: .
+      - checkout
+      - install_node
+      - install_yarn_dependencies
+      - install_pods_dependencies
+      
+      - run:
+          name: Generate Release IPA
+          working_directory: .
+          command: xcodebuild -scheme InstagramClone -workspace ios/InstagramClone.xcworkspace/ -configuration Release clean archive -archivePath Archive.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            
+      - run:
+          name: Prepare Release IPA for upload
+          working_directory: .
+          command: |
+            cd Archive.xcarchive/Products/
+            mv Applications Payload
+            zip -vr Payload.zip Payload/
+            mv Payload.zip InstagramClone.ipa
+            zip -vr InstagramCloneIPA.zip InstagramClone.ipa 
+            
+      - store_artifacts:
+          path: /Users/distiller/project/Archive.xcarchive/Products/InstagramCloneIPA.zip
+
+workflows:
+  test_and_build:
+    jobs:
+      - detox_test
+      - ios_release_build
